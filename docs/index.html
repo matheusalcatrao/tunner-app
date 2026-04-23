@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guitar Tuner — Afinador de Guitarra</title>
+  <meta name="description" content="Afinador de guitarra gratuito para Android e iOS. Detecção de pitch com algoritmo YIN em tempo real." />
+
+  <!-- Favicon placeholder (replace with your own) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎸</text></svg>" />
+
+  <style>
+    /* ── Reset ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Tokens (same palette as the app) ──────────── */
+    :root {
+      --bg:          #0B1020;
+      --surface:     #141C35;
+      --surface2:    #1A2440;
+      --border:      #2B355A;
+      --cyan:        #5DE2E7;
+      --cyan-dim:    #1F8A9E;
+      --text:        #F0F5FF;
+      --text-muted:  #8FA6D5;
+      --text-subtle: #4B5A8A;
+      --green:       #10B981;
+      --amber:       #F59E0B;
+      --radius:      14px;
+    }
+
+    /* ── Base ──────────────────────────────────────── */
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Nav ───────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(11, 16, 32, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .nav-logo span.icon { font-size: 24px; }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      transition: color .2s;
+    }
+
+    .nav-links a:hover { color: var(--cyan); text-decoration: none; }
+
+    /* ── Hero ──────────────────────────────────────── */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 96px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* subtle radial glow */
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(93,226,231,.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(36px, 7vw, 72px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      max-width: 800px;
+      margin-bottom: 20px;
+    }
+
+    h1 .accent { color: var(--cyan); }
+
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--text-muted);
+      max-width: 520px;
+      margin-bottom: 40px;
+    }
+
+    /* ── Buttons ───────────────────────────────────── */
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 56px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 26px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+      text-decoration: none;
+    }
+
+    .btn:hover { opacity: .88; transform: translateY(-1px); text-decoration: none; }
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: var(--cyan-dim);
+      border-color: var(--cyan);
+      color: var(--text);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-muted);
+    }
+
+    .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    .btn svg { flex-shrink: 0; }
+
+    /* disabled state */
+    .btn[aria-disabled="true"] {
+      opacity: .4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* ── Gauge mockup ──────────────────────────────── */
+    .gauge-mockup {
+      position: relative;
+      width: 280px;
+      height: 150px;
+      margin: 0 auto;
+    }
+
+    .gauge-arc {
+      width: 280px;
+      height: 140px;
+      border: 2px solid var(--border);
+      border-bottom: none;
+      border-radius: 140px 140px 0 0;
+      position: absolute;
+      bottom: 0;
+    }
+
+    .gauge-needle {
+      width: 4px;
+      height: 110px;
+      background: linear-gradient(to top, var(--cyan), rgba(93,226,231,.2));
+      border-radius: 2px;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform-origin: bottom center;
+      transform: translateX(-50%) rotate(-12deg);
+      animation: swing 3s ease-in-out infinite;
+    }
+
+    @keyframes swing {
+      0%   { transform: translateX(-50%) rotate(-18deg); }
+      50%  { transform: translateX(-50%) rotate(18deg); }
+      100% { transform: translateX(-50%) rotate(-18deg); }
+    }
+
+    .gauge-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--text);
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .gauge-labels {
+      display: flex;
+      justify-content: space-between;
+      position: absolute;
+      bottom: -22px;
+      width: 100%;
+      font-size: 11px;
+      color: var(--text-subtle);
+      font-weight: 600;
+    }
+
+    /* ── Note display ──────────────────────────────── */
+    .note-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .note-chip {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .note-freq {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .note-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .3; }
+    }
+
+    /* ── Features ──────────────────────────────────── */
+    .section {
+      padding: 80px 24px;
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 48px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: border-color .2s;
+    }
+
+    .feature-card:hover { border-color: var(--cyan); }
+
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .feature-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── String grid demo ──────────────────────────── */
+    .strings-demo {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 380px;
+      margin: 0 auto 56px;
+    }
+
+    .string-chip {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 12px;
+      text-align: center;
+      transition: border-color .2s;
+    }
+
+    .string-chip.active {
+      border-color: var(--cyan);
+      background: var(--surface2);
+    }
+
+    .string-chip .name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .string-chip.active .name { color: var(--cyan); }
+
+    .string-chip .hz {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── Download section ──────────────────────────── */
+    .download-section {
+      padding: 80px 24px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .download-inner {
+      max-width: 880px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .download-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color .2s;
+    }
+
+    .download-card:hover { border-color: var(--cyan); }
+
+    .download-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .platform-icon { font-size: 36px; }
+
+    .platform-name {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .platform-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 99px;
+      border: 1px solid;
+    }
+
+    .tag-green  { color: var(--green); border-color: var(--green);  background: rgba(16,185,129,.08); }
+    .tag-amber  { color: var(--amber); border-color: var(--amber);  background: rgba(245,158,11,.08); }
+    .tag-cyan   { color: var(--cyan);  border-color: var(--cyan);   background: rgba(93,226,231,.08); }
+
+    /* ── Tech stack ────────────────────────────────── */
+    .tech-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .tech-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* ── Footer ────────────────────────────────────── */
+    footer {
+      padding: 40px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-subtle);
+      border-top: 1px solid var(--border);
+    }
+
+    footer a { color: var(--text-muted); }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .strings-demo { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Nav ──────────────────────────────────────────── -->
+  <nav>
+    <div class="nav-logo">
+      <span class="icon">🎸</span>
+      Guitar Tuner
+    </div>
+    <ul class="nav-links">
+      <li><a href="#features">Recursos</a></li>
+      <li><a href="#download">Download</a></li>
+      <li><a href="#tech">Tecnologia</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── Hero ─────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span>🎵</span> Afinação em tempo real
+    </div>
+
+    <h1>O afinador de guitarra que cabe no <span class="accent">seu bolso</span></h1>
+
+    <p class="hero-sub">
+      Detecção de pitch com algoritmo YIN em TypeScript puro.
+      Funciona offline, sem anúncios, sem assinatura.
+    </p>
+
+    <div class="btn-group">
+      <!-- ⚠️ Substitua o href pelo link real do APK gerado pelo EAS -->
+      <a href="#download" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Baixar para Android
+      </a>
+      <a href="#download" class="btn btn-ghost">
+        Ver no GitHub
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+      </a>
+    </div>
+
+    <!-- Gauge mockup -->
+    <div class="note-display">
+      <div class="note-chip">A2</div>
+      <div class="note-freq">110.00 Hz</div>
+      <div class="note-status">
+        <span class="status-dot"></span> ✓ Afinado
+      </div>
+    </div>
+
+    <div class="gauge-mockup">
+      <div class="gauge-arc"></div>
+      <div class="gauge-needle"></div>
+      <div class="gauge-dot"></div>
+      <div class="gauge-labels">
+        <span>-50</span><span>0</span><span>+50</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── String grid demo ──────────────────────────────── -->
+  <div style="padding: 64px 24px 0; text-align:center;">
+    <p style="font-size:13px;color:var(--text-subtle);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;">Afinação padrão</p>
+    <div class="strings-demo">
+      <div class="string-chip"><div class="name">E2</div><div class="hz">82.41 Hz</div></div>
+      <div class="string-chip active"><div class="name">A2</div><div class="hz">110.00 Hz</div></div>
+      <div class="string-chip"><div class="name">D3</div><div class="hz">146.83 Hz</div></div>
+      <div class="string-chip"><div class="name">G3</div><div class="hz">196.00 Hz</div></div>
+      <div class="string-chip"><div class="name">B3</div><div class="hz">246.94 Hz</div></div>
+      <div class="string-chip"><div class="name">E4</div><div class="hz">329.63 Hz</div></div>
+    </div>
+  </div>
+
+  <!-- ── Features ─────────────────────────────────────── -->
+  <section class="section" id="features">
+    <p class="section-label">Recursos</p>
+    <h2 class="section-title">Tudo que você precisa para afinar</h2>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Algoritmo YIN</div>
+        <div class="feature-desc">Detecção de pitch com algoritmo YIN em TypeScript puro. Threshold 0.10, janela Hann, interpolação parabólica para máxima precisão.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Baixa latência</div>
+        <div class="feature-desc">Ring buffer Float32Array com <code style="color:var(--cyan);background:var(--surface2);padding:1px 5px;border-radius:4px">copyWithin</code>. Overlap de 50% e atualização de UI a 30 Hz.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <div class="feature-title">Over-The-Air Update</div>
+        <div class="feature-desc">Atualizações via EAS Update sem publicar nova versão nas lojas. Canais development, preview e production.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎸</div>
+        <div class="feature-title">6 cordas padrão</div>
+        <div class="feature-desc">E2 · A2 · D3 · G3 · B3 · E4. Grid interativo com destaque da corda mais próxima da frequência detectada.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Agulha animada</div>
+        <div class="feature-desc">Indicador visual de cents com animação spring nativa. Feedback de cor para grave, afinado e agudo em tempo real.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔇</div>
+        <div class="feature-title">Gate de silêncio</div>
+        <div class="feature-desc">RMS gate para ignorar ruído ambiente. EMA simples (α=0.25) suaviza leituras sem mascarar transientes.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Download ──────────────────────────────────────── -->
+  <section class="download-section" id="download">
+    <div style="text-align:center;margin-bottom:40px;">
+      <p class="section-label">Download</p>
+      <h2 class="section-title" style="margin-bottom:8px;">Instale gratuitamente</h2>
+      <p style="color:var(--text-muted);font-size:15px;">Sem anúncios. Sem assinatura. Open source.</p>
+    </div>
+
+    <div class="download-inner">
+
+      <!-- Android -->
+      <div class="download-card">
+        <div class="download-card-header">
+          <span class="platform-icon">🤖</span>
+          <div>
+            <div class="platform-name">Android</div>
+            <span class="tag tag-green">Disponível</span>
+          </div>
+        </div>
+        <p class="platform-sub">
+          Baixe o APK direto e instale sem precisar da Play Store.
+          Habilite "Fontes desconhecidas" nas configurações do Android.
+        </p>
+        <!-- ⚠️ Substitua o href pelo link público do APK gerado pelo EAS -->
+        <a href="https://expo.dev/artifacts/eas/jTyKWRaHe6EDaK2uhjDxFF.apk" class="btn btn-primary" style="justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar APK (Android)
+        </a>
+        <p style="font-size:11px;color:var(--text-subtle);">Versão 1.0.0 · Requer Android 8.0+</p>
+      </div>
+
+      <!-- iOS -->
+      <div class="download-card">
+        <div class="download-card-header">
+          <span class="platform-icon">🍎</span>
+          <div>
+            <div class="platform-name">iPhone / iPad</div>
+            <span class="tag tag-amber">Em breve</span>
+          </div>
+        </div>
+        <p class="platform-sub">
+          A distribuição iOS requer conta Apple Developer. Por enquanto,
+          clone o repositório e compile localmente com Xcode ou EAS.
+        </p>
+        <!-- Link do repositório para compilar localmente -->
+        <a href="https://github.com/matheusalcatrao/tunner-app" class="btn btn-ghost" style="justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+          Ver repositório no GitHub
+        </a>
+        <p style="font-size:11px;color:var(--text-subtle);">Requer Apple Developer Program para distribuição</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Tech stack ────────────────────────────────────── -->
+  <section class="section" id="tech">
+    <p class="section-label">Tecnologia</p>
+    <h2 class="section-title">Open source de ponta a ponta</h2>
+
+    <div style="max-width:640px;">
+      <p style="color:var(--text-muted);margin-bottom:8px;font-size:15px;">
+        Construído com React Native + Expo, sem dependências de DSP externas.
+        Todo o processamento de áudio roda em TypeScript puro no JS thread.
+      </p>
+      <div class="tech-list">
+        <span class="tech-pill">React Native 0.81</span>
+        <span class="tech-pill">Expo SDK 54</span>
+        <span class="tech-pill">TypeScript 5.9</span>
+        <span class="tech-pill">YIN Algorithm</span>
+        <span class="tech-pill">react-native-audio-record</span>
+        <span class="tech-pill">EAS Build</span>
+        <span class="tech-pill">EAS Update (OTA)</span>
+        <span class="tech-pill">Float32Array Ring Buffer</span>
+        <span class="tech-pill">Hann Window</span>
+        <span class="tech-pill">EMA Smoothing</span>
+        <span class="tech-pill">Animated API</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────── -->
+  <footer>
+    <p>
+      Feito com 🎸 por <a href="https://github.com/matheusalcatrao">@matheusalcatrao</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/matheusalcatrao/tunner-app">GitHub</a>
+      &nbsp;·&nbsp;
+      Gratuito e open source
+    </p>
+  </footer>
+
+</body>
+</html>
