@@ -8,6 +8,14 @@ Boilerplate para app afinador de guitarra com:
 - utilitários `pitchDetector` e `noteUtils`
 - `TunerScreen` com agulha animada e grid de cordas padrão
 
+## Preview
+
+<div align="center">
+  <img src="docs/screenshot.png" alt="Guitar Tuner App" width="320" />
+</div>
+
+---
+
 ## Estrutura
 
 - src/hooks/useTuner.ts

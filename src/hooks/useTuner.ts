@@ -210,12 +210,6 @@ export function useTuner(options: UseTunerOptions = {}) {
   );
 
   const start = useCallback(async () => {
-    const allowed = await requestMicPermission();
-    if (!allowed) {
-      setState((prev) => ({ ...prev, error: "Microphone permission denied." }));
-      return;
-    }
-
     try {
       // Always stop and reset before starting/restarting
       isListeningRef.current = false;
@@ -232,7 +226,7 @@ export function useTuner(options: UseTunerOptions = {}) {
         },
         onAudioChunk,
       );
-      startAudioCapture();
+      await startAudioCapture();
       isListeningRef.current = true;
 
       setState((prev) => ({
@@ -241,20 +235,14 @@ export function useTuner(options: UseTunerOptions = {}) {
         status: "listening",
         error: null,
       }));
-    } catch {
-      setState((prev) => ({
-        ...prev,
-        error:
-          "Falha ao iniciar captura de áudio. Em Expo Go, use Dev Build após prebuild para módulos nativos.",
-      }));
+    } catch (e) {
+      const message =
+        e instanceof Error
+          ? e.message
+          : "Falha ao iniciar captura de áudio. Use Dev Build após prebuild para módulos nativos.";
+      setState((prev) => ({ ...prev, error: message }));
     }
-  }, [
-    config.bitsPerSample,
-    config.channels,
-    config.sampleRate,
-    onAudioChunk,
-    requestMicPermission,
-  ]);
+  }, [config.bitsPerSample, config.channels, config.sampleRate, onAudioChunk]);
 
   const stop = useCallback(async () => {
     isListeningRef.current = false;

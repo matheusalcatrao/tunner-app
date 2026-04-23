@@ -1,4 +1,6 @@
 import { Buffer } from "buffer";
+import { Audio } from "expo-av";
+import { Platform } from "react-native";
 import AudioRecord from "react-native-audio-record";
 
 type ChunkListener = (samples: Float32Array) => void;
@@ -45,7 +47,19 @@ export function setupAudioCapture(
   AudioRecord.on("data", currentListener);
 }
 
-export function startAudioCapture(): void {
+export async function startAudioCapture(): Promise<void> {
+  // iOS: request microphone permission and configure audio session
+  if (Platform.OS === "ios") {
+    const { granted } = await Audio.requestPermissionsAsync();
+    if (!granted) {
+      throw new Error("Permissão de microfone negada. Vá em Ajustes > Guitar Tuner e permita o microfone.");
+    }
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: true,
+      playsInSilentModeIOS: true,
+    });
+  }
+
   AudioRecord.start();
   started = true;
 }

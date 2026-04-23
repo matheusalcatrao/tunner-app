@@ -15,6 +15,13 @@
         "buildType": "apk"
       }
     },
+    "diawi": {
+      "ios": {
+        "simulator": false,
+        "enterpriseProvisioning": "adhoc"
+      },
+      "distribution": "internal"
+    },
     "production": {
       "autoIncrement": true,
       "channel": "production"
