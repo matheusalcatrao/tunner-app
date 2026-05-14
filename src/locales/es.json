@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "Afinador de guitarra"
+  },
+  "tuner": {
+    "note": "Nota",
+    "meta": "Objetivo: {{target}} • Claridad: {{clarity}}%",
+    "defaultStrings": "Cuerdas estándar"
+  },
+  "status": {
+    "analyzing": "Analizando...",
+    "listening": "Esperando señal...",
+    "inTune": "✓ Afinado",
+    "flat": "▼ Grave",
+    "sharp": "▲ Agudo",
+    "silent": "Detenido"
+  },
+  "actions": {
+    "start": "Iniciar",
+    "restart": "Reiniciar",
+    "stop": "Detener"
+  },
+  "ota": {
+    "updateAvailable": "🔄 Nueva versión disponible — toca para actualizar"
+  },
+  "permissions": {
+    "androidMicTitle": "Permiso del micrófono",
+    "androidMicMessage": "El afinador necesita acceso al micrófono para detectar el tono de la guitarra.",
+    "allow": "Permitir"
+  },
+  "errors": {
+    "audioCaptureFailed": "No se pudo iniciar la captura de audio. Usa un Dev Build tras prebuild para módulos nativos."
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "Inglés",
+    "pt": "Portugués",
+    "es": "Español"
+  }
+}

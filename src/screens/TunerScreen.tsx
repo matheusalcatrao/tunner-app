@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { TunerNeedle } from '../components/TunerNeedle';
 import { StringGrid } from '../components/StringGrid';
 import { useTuner } from '../hooks/useTuner';
@@ -7,6 +9,7 @@ import { useOTAUpdate } from '../hooks/useOTAUpdate';
 import type { TuningNote } from '../types/tuner';
 
 export function TunerScreen() {
+  const { t } = useTranslation();
   const { state, start, stop, resetError } = useTuner();
   const { otaState, applyUpdate } = useOTAUpdate();
   const [selectedString, setSelectedString] = useState<TuningNote | null>(null);
@@ -53,18 +56,37 @@ export function TunerScreen() {
 
   const rmsWidth = `${Math.min(100, state.rms * 800)}%` as `${number}%`;
 
+  const statusLabel =
+    state.status === 'analyzing'
+      ? t('status.analyzing')
+      : state.status === 'listening'
+        ? t('status.listening')
+        : state.status === 'in-tune'
+          ? t('status.inTune')
+          : state.status === 'flat'
+            ? t('status.flat')
+            : state.status === 'sharp'
+              ? t('status.sharp')
+              : t('status.silent');
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Guitar Tuner</Text>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>{t('app.title')}</Text>
+        <LanguageSwitcher />
+      </View>
 
       <View style={styles.noteBox}>
-        <Text style={styles.noteLabel}>Nota</Text>
+        <Text style={styles.noteLabel}>{t('tuner.note')}</Text>
         <Animated.Text style={[styles.noteValue, { opacity: isAnalyzing ? pulseAnim : 1 }]}>
           {state.noteMatch?.note ?? (isAnalyzing ? '···' : '--')}
         </Animated.Text>
         <Text style={styles.freqValue}>{state.smoothedPitchHz?.toFixed(2) ?? '--'} Hz</Text>
         <Text style={styles.meta}>
-          Alvo: {currentTarget?.label ?? '--'} • Clareza: {(state.clarity * 100).toFixed(0)}%
+          {t('tuner.meta', {
+            target: currentTarget?.label ?? '--',
+            clarity: (state.clarity * 100).toFixed(0),
+          })}
         </Text>
 
         {/* RMS level bar */}
@@ -77,21 +99,17 @@ export function TunerScreen() {
 
       <View style={styles.statusRow}>
         <Animated.View style={[styles.statusDot, { backgroundColor: statusColor, opacity: pulseAnim }]} />
-        <Text style={[styles.statusText, { color: statusColor }]}>
-          {state.status === 'analyzing' ? 'Analisando...' :
-           state.status === 'listening' ? 'Aguardando sinal...' :
-           state.status === 'in-tune'   ? '✓ Afinado' :
-           state.status === 'flat'      ? '▼ Grave' :
-           state.status === 'sharp'     ? '▲ Agudo' : 'Parado'}
-        </Text>
+        <Text style={[styles.statusText, { color: statusColor }]}>{statusLabel}</Text>
       </View>
 
       <View style={styles.actionsRow}>
         <Pressable style={[styles.button, styles.buttonPrimary]} onPress={() => void start()}>
-          <Text style={styles.buttonText}>{state.isListening ? 'Restart' : 'Start'}</Text>
+          <Text style={styles.buttonText}>
+            {state.isListening ? t('actions.restart') : t('actions.start')}
+          </Text>
         </Pressable>
         <Pressable style={[styles.button, styles.buttonGhost]} onPress={() => void stop()}>
-          <Text style={styles.buttonText}>Stop</Text>
+          <Text style={styles.buttonText}>{t('actions.stop')}</Text>
         </Pressable>
       </View>
 
@@ -103,11 +121,11 @@ export function TunerScreen() {
 
       {otaState.isUpdateAvailable ? (
         <Pressable style={styles.updateBanner} onPress={() => void applyUpdate()}>
-          <Text style={styles.updateBannerText}>🔄 Nova versão disponível — toque para atualizar</Text>
+          <Text style={styles.updateBannerText}>{t('ota.updateAvailable')}</Text>
         </Pressable>
       ) : null}
 
-      <Text style={styles.sectionTitle}>Cordas padrão</Text>
+      <Text style={styles.sectionTitle}>{t('tuner.defaultStrings')}</Text>
       <StringGrid activeString={currentTarget} onSelectString={setSelectedString} />
     </ScrollView>
   );
@@ -175,7 +193,9 @@ const styles = StyleSheet.create({
   statusText: {
     color: '#D9E4FF',
     fontWeight: '600',
-    textTransform: 'capitalize',
+  },
+  headerRow: {
+    gap: 14,
   },
   actionsRow: {
     flexDirection: 'row',

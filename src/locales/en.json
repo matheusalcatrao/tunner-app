@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "Guitar Tuner"
+  },
+  "tuner": {
+    "note": "Note",
+    "meta": "Target: {{target}} • Clarity: {{clarity}}%",
+    "defaultStrings": "Standard strings"
+  },
+  "status": {
+    "analyzing": "Analyzing...",
+    "listening": "Waiting for signal...",
+    "inTune": "✓ In tune",
+    "flat": "▼ Flat",
+    "sharp": "▲ Sharp",
+    "silent": "Stopped"
+  },
+  "actions": {
+    "start": "Start",
+    "restart": "Restart",
+    "stop": "Stop"
+  },
+  "ota": {
+    "updateAvailable": "🔄 New version available — tap to update"
+  },
+  "permissions": {
+    "androidMicTitle": "Microphone permission",
+    "androidMicMessage": "The tuner needs microphone access to detect guitar pitch.",
+    "allow": "Allow"
+  },
+  "errors": {
+    "audioCaptureFailed": "Failed to start audio capture. Use a Dev Build after prebuild for native modules."
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "pt": "Portuguese",
+    "es": "Spanish"
+  }
+}
