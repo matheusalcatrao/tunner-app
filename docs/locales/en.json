@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "title": "Guitar Tuner — Free guitar tuner app",
+    "description": "Free guitar tuner for Android and iOS. Real-time pitch detection with the YIN algorithm."
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "pt": "Portuguese",
+    "es": "Spanish"
+  },
+  "nav": {
+    "brand": "Guitar Tuner",
+    "features": "Features",
+    "download": "Download",
+    "tech": "Tech"
+  },
+  "hero": {
+    "badge": "Real-time tuning",
+    "title": "The guitar tuner that fits in your <span class=\"accent\">pocket</span>",
+    "sub": "Pitch detection with the YIN algorithm in pure TypeScript. Works offline, no ads, no subscription.",
+    "btnAndroid": "Download for Android",
+    "btnGithub": "View on GitHub",
+    "tunedStatus": "✓ In tune"
+  },
+  "stringsSection": {
+    "label": "Standard tuning"
+  },
+  "features": {
+    "label": "Features",
+    "title": "Everything you need to tune",
+    "yinTitle": "YIN algorithm",
+    "yinDesc": "Pitch detection with the YIN algorithm in pure TypeScript. Threshold 0.10, Hann window, parabolic interpolation for maximum accuracy.",
+    "latencyTitle": "Low latency",
+    "latencyDesc": "Float32Array ring buffer with <code style=\"color:var(--cyan);background:var(--surface2);padding:1px 5px;border-radius:4px\">copyWithin</code>. 50% overlap and UI updates at 30 Hz.",
+    "otaTitle": "Over-the-air updates",
+    "otaDesc": "Updates via EAS Update without publishing a new store release. development, preview, and production channels.",
+    "stringsTitle": "6 standard strings",
+    "stringsDesc": "E2 · A2 · D3 · G3 · B3 · E4. Interactive grid highlighting the string closest to the detected frequency.",
+    "needleTitle": "Animated needle",
+    "needleDesc": "Visual cents indicator with native spring animation. Color feedback for flat, in tune, and sharp in real time.",
+    "gateTitle": "Silence gate",
+    "gateDesc": "RMS gate to ignore ambient noise. Simple EMA (α=0.25) smooths readings without masking transients."
+  },
+  "download": {
+    "label": "Download",
+    "title": "Install for free",
+    "tagline": "No ads. No subscription. Open source.",
+    "androidName": "Android",
+    "androidTag": "Available",
+    "androidBody": "Download the APK directly without the Play Store. Enable “Install unknown apps” or “Unknown sources” in Android settings.",
+    "androidBtn": "Download APK (Android)",
+    "androidMeta": "Version 1.0.0 · Requires Android 8.0+",
+    "iosName": "iPhone / iPad",
+    "iosTag": "Coming soon",
+    "iosBody": "iOS distribution requires an Apple Developer account. For now, clone the repository and build locally with Xcode or EAS.",
+    "iosBtn": "View repository on GitHub",
+    "iosMeta": "Requires Apple Developer Program for distribution"
+  },
+  "tech": {
+    "label": "Technology",
+    "title": "Open source end to end",
+    "body": "Built with React Native + Expo, with no external DSP dependencies. All audio processing runs in pure TypeScript on the JS thread."
+  },
+  "footer": {
+    "html": "Made with 🎸 by <a href=\"https://github.com/matheusalcatrao\">@matheusalcatrao</a> &nbsp;·&nbsp; <a href=\"https://github.com/matheusalcatrao/tunner-app\">GitHub</a> &nbsp;·&nbsp; Free and open source"
+  }
+}
