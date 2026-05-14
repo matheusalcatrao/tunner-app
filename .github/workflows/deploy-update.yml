@@ -29,4 +29,4 @@ jobs:
         run: npm install
 
       - name: 🚀 Publish Update
-        run: npx eas update --branch production --message "${{ github.event.head_commit.message }}"
+        run: npx -p eas-cli eas update --branch production --message "${{ github.event.head_commit.message }}"
