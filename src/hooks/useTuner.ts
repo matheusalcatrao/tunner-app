@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
+
+import i18n from "../i18n";
 import { AUDIO_CONFIG, getHopSize } from "../config/audioConfig";
 import { nearestGuitarString, frequencyToNoteMatch } from "../utils/noteUtils";
 import { detectPitchYIN } from "../utils/pitchDetector";
@@ -91,9 +93,9 @@ export function useTuner(options: UseTunerOptions = {}) {
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
       {
-        title: "Microphone Permission",
-        message: "The tuner needs microphone access to detect guitar pitch.",
-        buttonPositive: "Allow",
+        title: i18n.t("permissions.androidMicTitle"),
+        message: i18n.t("permissions.androidMicMessage"),
+        buttonPositive: i18n.t("permissions.allow"),
       },
     );
 
@@ -239,7 +241,7 @@ export function useTuner(options: UseTunerOptions = {}) {
       const message =
         e instanceof Error
           ? e.message
-          : "Falha ao iniciar captura de áudio. Use Dev Build após prebuild para módulos nativos.";
+          : i18n.t("errors.audioCaptureFailed");
       setState((prev) => ({ ...prev, error: message }));
     }
   }, [config.bitsPerSample, config.channels, config.sampleRate, onAudioChunk]);

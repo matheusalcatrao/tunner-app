@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "title": "Guitar Tuner — Afinador de guitarra",
+    "description": "Afinador de guitarra gratuito para Android e iOS. Detección de tono con el algoritmo YIN en tiempo real."
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "Inglés",
+    "pt": "Portugués",
+    "es": "Español"
+  },
+  "nav": {
+    "brand": "Guitar Tuner",
+    "features": "Funciones",
+    "download": "Descarga",
+    "tech": "Tecnología"
+  },
+  "hero": {
+    "badge": "Afinación en tiempo real",
+    "title": "El afinador de guitarra que cabe en tu <span class=\"accent\">bolsillo</span>",
+    "sub": "Detección de tono con el algoritmo YIN en TypeScript puro. Funciona sin conexión, sin anuncios, sin suscripción.",
+    "btnAndroid": "Descargar para Android",
+    "btnGithub": "Ver en GitHub",
+    "tunedStatus": "✓ Afinado"
+  },
+  "stringsSection": {
+    "label": "Afinación estándar"
+  },
+  "features": {
+    "label": "Funciones",
+    "title": "Todo lo que necesitas para afinar",
+    "yinTitle": "Algoritmo YIN",
+    "yinDesc": "Detección de tono con el algoritmo YIN en TypeScript puro. Umbral 0.10, ventana Hann, interpolación parabólica para máxima precisión.",
+    "latencyTitle": "Baja latencia",
+    "latencyDesc": "Búfer circular Float32Array con <code style=\"color:var(--cyan);background:var(--surface2);padding:1px 5px;border-radius:4px\">copyWithin</code>. Solapamiento del 50% y actualización de la UI a 30 Hz.",
+    "otaTitle": "Actualizaciones over-the-air",
+    "otaDesc": "Actualizaciones vía EAS Update sin publicar una nueva versión en las tiendas. Canales development, preview y production.",
+    "stringsTitle": "6 cuerdas estándar",
+    "stringsDesc": "E2 · A2 · D3 · G3 · B3 · E4. Cuadrícula interactiva que resalta la cuerda más cercana a la frecuencia detectada.",
+    "needleTitle": "Aguja animada",
+    "needleDesc": "Indicador visual de cents con animación spring nativa. Retroalimentación de color para grave, afinado y agudo en tiempo real.",
+    "gateTitle": "Puerta de silencio",
+    "gateDesc": "Puerta RMS para ignorar ruido ambiente. EMA simple (α=0.25) suaviza lecturas sin enmascarar transientes."
+  },
+  "download": {
+    "label": "Descarga",
+    "title": "Instala gratis",
+    "tagline": "Sin anuncios. Sin suscripción. Código abierto.",
+    "androidName": "Android",
+    "androidTag": "Disponible",
+    "androidBody": "Descarga el APK directamente sin la Play Store. Activa “Orígenes desconocidos” o “Instalar apps desconocidas” en la configuración de Android.",
+    "androidBtn": "Descargar APK (Android)",
+    "androidMeta": "Versión 1.0.0 · Requiere Android 8.0+",
+    "iosName": "iPhone / iPad",
+    "iosTag": "Próximamente",
+    "iosBody": "La distribución en iOS requiere cuenta de Apple Developer. Por ahora, clona el repositorio y compila en local con Xcode o EAS.",
+    "iosBtn": "Ver repositorio en GitHub",
+    "iosMeta": "Requiere Apple Developer Program para distribución"
+  },
+  "tech": {
+    "label": "Tecnología",
+    "title": "Código abierto de punta a punta",
+    "body": "Construido con React Native + Expo, sin dependencias DSP externas. Todo el procesamiento de audio corre en TypeScript puro en el hilo JS."
+  },
+  "footer": {
+    "html": "Hecho con 🎸 por <a href=\"https://github.com/matheusalcatrao\">@matheusalcatrao</a> &nbsp;·&nbsp; <a href=\"https://github.com/matheusalcatrao/tunner-app\">GitHub</a> &nbsp;·&nbsp; Gratis y de código abierto"
+  }
+}
