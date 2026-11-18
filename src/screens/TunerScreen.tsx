@@ -33,19 +33,15 @@ export function TunerScreen() {
     }
   }, [state.status, pulseAnim]);
 
+  const currentTarget = selectedString ?? state.targetString;
+
   const cents = useMemo(() => {
-    if (!state.noteMatch) {
+    if (!currentTarget || !state.smoothedPitchHz) {
       return 0;
     }
 
-    if (selectedString && state.smoothedPitchHz) {
-      return 1200 * Math.log2(state.smoothedPitchHz / selectedString.frequencyHz);
-    }
-
-    return state.noteMatch.cents;
-  }, [selectedString, state.noteMatch, state.smoothedPitchHz]);
-
-  const currentTarget = selectedString ?? state.targetString;
+    return 1200 * Math.log2(state.smoothedPitchHz / currentTarget.frequencyHz);
+  }, [currentTarget, state.smoothedPitchHz]);
 
   const isAnalyzing = state.status === 'analyzing';
   const statusColor =
@@ -81,7 +77,7 @@ export function TunerScreen() {
         <Animated.Text style={[styles.noteValue, { opacity: isAnalyzing ? pulseAnim : 1 }]}>
           {state.noteMatch?.note ?? (isAnalyzing ? '···' : '--')}
         </Animated.Text>
-        <Text style={styles.freqValue}>{state.smoothedPitchHz?.toFixed(2) ?? '--'} Hz</Text>
+        <Text style={styles.freqValue}>{state.pitchHz?.toFixed(2) ?? '--'} Hz</Text>
         <Text style={styles.meta}>
           {t('tuner.meta', {
             target: currentTarget?.label ?? '--',
