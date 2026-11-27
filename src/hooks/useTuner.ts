@@ -149,8 +149,11 @@ export function useTuner(options: UseTunerOptions = {}) {
       }
       lastUiUpdateRef.current = now;
 
-      const noteMatch = frequencyToNoteMatch(smoothed);
-      const targetString = nearestGuitarString(smoothed);
+      // Recognition must use the current measurement, not the value used to
+      // smooth the needle. Otherwise a change of string is intentionally
+      // delayed by the EMA filter.
+      const noteMatch = frequencyToNoteMatch(result.frequencyHz);
+      const targetString = nearestGuitarString(result.frequencyHz);
 
       let status: TunerState["status"] = "in-tune";
       if (noteMatch.cents < -5) {

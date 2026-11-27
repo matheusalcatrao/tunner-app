@@ -9,8 +9,10 @@ export const AUDIO_CONFIG = {
   yinThreshold: 0.10,
   rmsGate: 0.003,
   minClarity: 0.20,
-  emaAlpha: 0.25,
-  uiUpdateIntervalMs: 30,
+  // Smooth only the visual needle. Higher values reduce the time it takes
+  // to react to a real pitch change while still filtering small fluctuations.
+  emaAlpha: 0.5,
+  uiUpdateIntervalMs: 16,
   ringBufferCapacity: 16384,
 } as const;
 
